@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
-import cors from "cors";
 import { connectDB } from "./configs/database";
 import { router } from "./Routes";
 import {
@@ -12,9 +11,10 @@ import {
 const PORT = process.env.PORT || 8080;
 
 const app = express();
-// connectDB();
 
-app.use(cors());
+// ✅ CORS FIRST (before routes & body)
+app.use(CorsMiddleware.checkOrigin);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,19 +24,18 @@ app.get("/", (_req: Request, res: Response) => {
 
 // Custom Middlewares
 app.use(ResponseMiddleware.success);
-app.use(CorsMiddleware.checkOrigin);
 app.use(DatabaseMiddleware.checkConnection);
 
 app.use("/api", router);
 
-// Error Handling Routes
+// Error Handling
 app.use(ResponseMiddleware.notFound);
 app.use(ResponseMiddleware.error);
 
 app.listen(PORT, async () => {
   try {
     await connectDB();
-    console.log(`Server running on  http://localhost:${PORT}🚀`);
+    console.log(`Server running on port ${PORT} 🚀`);
   } catch (error) {
     console.error("Server startup failed:", error);
     process.exit(1);
