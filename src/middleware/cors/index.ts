@@ -1,6 +1,11 @@
 import cors from "cors";
-import { allowedOrigins } from "../../constants";
 import { AppError } from "../../classes/AppError";
+import { FRONTEND_DEVELOPMENT_URL, FRONTEND_PRODUCTION_URL } from "../../env";
+
+const allowedOrigins = [
+  FRONTEND_PRODUCTION_URL,
+  FRONTEND_DEVELOPMENT_URL,
+].filter(Boolean);
 
 export const checkOrigin = cors({
   origin: (origin, callback) => {
@@ -10,7 +15,7 @@ export const checkOrigin = cors({
       callback(new AppError("Not allowed by CORS", 403));
     }
   },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
 });
